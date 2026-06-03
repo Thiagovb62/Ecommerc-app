@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 app.use(express.json());
 
@@ -7,6 +9,8 @@ const userRoutes = require('./routes/userRoutes');
 const produtoRoutes = require('./routes/produtoRoutes');
 const carrinhoRoutes = require('./routes/carrinhoRoutes');
 const checkoutRoutes = require('./routes/checkoutRoutes');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use('/api/users', userRoutes);
 app.use('/api/produtos', produtoRoutes);
