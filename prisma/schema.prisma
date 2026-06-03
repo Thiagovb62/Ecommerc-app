@@ -36,6 +36,7 @@ model Pedido {
   id          Int       @id @default(autoincrement())
   produtoId   Int?
   carrinhoId  Int?
+  preco       Float
   quantidade  Int
   dataPedido  String?
   produto     Produto?  @relation(fields: [produtoId], references: [id])
