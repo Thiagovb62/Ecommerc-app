@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Ecommerce</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .cadastro-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .cadastro-container h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .btn-cadastrar {
+            width: 100%;
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .btn-voltar {
+            width: 100%;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .sucesso {
+            background: #27ae60;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .erro {
+            background: #e74c3c;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cadastro-container">
+            <h2><i class="fas fa-user-plus"></i> Criar Conta</h2>
+            <div id="mensagem" style="display: none;"></div>
+            <form id="cadastro-form">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="name" required placeholder="Seu nome">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" required placeholder="email@exemplo.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="password" required placeholder="******">
+                </div>
+                <button type="submit" class="btn-cadastrar">Cadastrar</button>
+            </form>
+            <button id="btn-voltar" class="btn-voltar">Voltar ao Login</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '';
+
+        document.getElementById('cadastro-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                if (response.ok) {
+                    mostrarMensagem('Cadastro realizado! Faça login.', 'sucesso');
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 2000);
+                } else {
+                    const erro = await response.json();
+                    mostrarMensagem(erro.error || 'Erro ao cadastrar', 'erro');
+                }
+            } catch (error) {
+                mostrarMensagem('Erro ao cadastrar. Tente novamente.', 'erro');
+            }
+        });
+        
+        document.getElementById('btn-voltar').addEventListener('click', () => {
+            window.location.href = '/login.html';
+        });
+        
+        function mostrarMensagem(msg, tipo) {
+            const div = document.getElementById('mensagem');
+            div.textContent = msg;
+            div.className = tipo;
+            div.style.display = 'block';
+            setTimeout(() => {
+                div.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
