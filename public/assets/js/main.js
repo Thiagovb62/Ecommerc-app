@@ -1,10 +1,16 @@
 const API_URL = '';
 let userId = localStorage.getItem('userId');
-let abaAtual = 'produtos';
+let userPerfil = localStorage.getItem('userPerfil');
 
 if (!userId) {
     window.location.href = '/login.html';
 }
+
+if (userPerfil === 'admin') {
+    window.location.href = '/admin.html';
+}
+
+let abaAtual = 'produtos';
 
 const produtosSection = document.getElementById('produtos-section');
 const carrinhoSection = document.getElementById('carrinho-section');
@@ -205,8 +211,7 @@ finalizarCompra.addEventListener('click', () => {
 
 document.getElementById('sair-link').addEventListener('click', (e) => {
     e.preventDefault();
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userName');
+    localStorage.clear();
     window.location.href = '/login.html';
 });
 

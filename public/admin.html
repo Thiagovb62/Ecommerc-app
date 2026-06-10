@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gerenciar Produtos</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-store"></i> Admin - Meu Ecommerce</h1>
+            <nav>
+                <a href="#" id="produtos-link" class="active"><i class="fas fa-box"></i> Produtos</a>
+                <a href="#" id="sair-link" class="sair-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="admin-container">
+            <h2><i class="fas fa-plus-circle"></i> Cadastrar Produto</h2>
+            <form id="form-produto" class="form-produto">
+                <input type="hidden" id="produto-id">
+                <div class="form-group">
+                    <label>Nome do Produto</label>
+                    <input type="text" id="nome" required placeholder="Ex: Notebook Gamer">
+                </div>
+                <div class="form-group">
+                    <label>Preço (R$)</label>
+                    <input type="number" id="preco" step="0.01" required placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="descricao" rows="3" placeholder="Descrição do produto"></textarea>
+                </div>
+                <button type="submit" class="btn-salvar"><i class="fas fa-save"></i> Salvar Produto</button>
+                <button type="button" id="btn-cancelar" class="btn-voltar" style="display: none;"><i class="fas fa-times"></i> Cancelar</button>
+            </form>
+
+            <h2><i class="fas fa-list"></i> Lista de Produtos</h2>
+            <div class="produtos-lista" id="produtos-lista">
+                <div class="loading">Carregando produtos...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p><i class="far fa-copyright"></i> <span id="ano-atual"></span> Meu Ecommerce - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = '';
+        const userPerfil = localStorage.getItem('userPerfil');
+
+        if (!userPerfil || userPerfil !== 'admin') {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('ano-atual').textContent = new Date().getFullYear();
+
+        document.getElementById('sair-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '/login.html';
+        });
+
+        async function carregarProdutos() {
+            try {
+                const response = await fetch(`${API_URL}/api/produtos`);
+                const produtos = await response.json();
+                exibirProdutos(produtos);
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('produtos-lista').innerHTML = '<p>Erro ao carregar produtos</p>';
+            }
+        }
+
+        function exibirProdutos(produtos) {
+            if (!produtos.length) {
+                document.getElementById('produtos-lista').innerHTML = '<p>Nenhum produto cadastrado</p>';
+                return;
+            }
+
+            const html = produtos.map(produto => `
+                <div class="produto-item">
+                    <div class="produto-info">
+                        <h4>${produto.nome}</h4>
+                        <p>R$ ${produto.preco.toFixed(2)}</p>
+                        <small>${produto.descricao || 'Sem descrição'}</small>
+                    </div>
+                    <div class="produto-acoes">
+                        <button class="btn-editar" onclick="editarProduto(${produto.id})"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="btn-excluir" onclick="excluirProduto(${produto.id})"><i class="fas fa-trash"></i> Excluir</button>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('produtos-lista').innerHTML = html;
+        }
+
+        document.getElementById('form-produto').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('produto-id').value;
+            const nome = document.getElementById('nome').value;
+            const preco = parseFloat(document.getElementById('preco').value);
+            const descricao = document.getElementById('descricao').value;
+            
+            const produto = { nome, preco, descricao };
+            
+            try {
+                let response;
+                if (id) {
+                    response = await fetch(`${API_URL}/api/produtos/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(produto)
+                    });
+                } else {
+                    response = await fetch(`${API_URL}/api/produtos`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(produto)
+                    });
+                }
+                
+                if (response.ok) {
+                    alert(id ? 'Produto atualizado!' : 'Produto cadastrado!');
+                    limparFormulario();
+                    carregarProdutos();
+                } else {
+                    alert('Erro ao salvar produto');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao salvar produto');
+            }
+        });
+
+        window.editarProduto = async function(id) {
+            try {
+                const response = await fetch(`${API_URL}/api/produtos/${id}`);
+                const produto = await response.json();
+                
+                document.getElementById('produto-id').value = produto.id;
+                document.getElementById('nome').value = produto.nome;
+                document.getElementById('preco').value = produto.preco;
+                document.getElementById('descricao').value = produto.descricao || '';
+                document.getElementById('btn-cancelar').style.display = 'inline-block';
+                document.querySelector('.btn-salvar').innerHTML = '<i class="fas fa-edit"></i> Atualizar Produto';
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar produto');
+            }
+        };
+
+        window.excluirProduto = async function(id) {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                try {
+                    const response = await fetch(`${API_URL}/api/produtos/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        alert('Produto excluído!');
+                        carregarProdutos();
+                    } else {
+                        alert('Erro ao excluir produto');
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao excluir produto');
+                }
+            }
+        };
+
+        function limparFormulario() {
+            document.getElementById('produto-id').value = '';
+            document.getElementById('nome').value = '';
+            document.getElementById('preco').value = '';
+            document.getElementById('descricao').value = '';
+            document.getElementById('btn-cancelar').style.display = 'none';
+            document.querySelector('.btn-salvar').innerHTML = '<i class="fas fa-save"></i> Salvar Produto';
+        }
+
+        document.getElementById('btn-cancelar').addEventListener('click', limparFormulario);
+
+        carregarProdutos();
+    </script>
+</body>
+</html>

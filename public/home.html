@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce - Sua Loja Online</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-store"></i> Meu Ecommerce</h1>
+            <nav>
+                <a href="#" id="produtos-link" class="active"><i class="fas fa-box"></i> Produtos</a>
+                <a href="#" id="carrinho-link"><i class="fas fa-shopping-cart"></i> Carrinho (<span id="carrinho-count">0</span>)</a>
+                <a href="#" id="sair-link" class="sair-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="produtos-section">
+            <h2>Nossos Produtos</h2>
+            <div class="produtos-grid" id="produtos-container">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando produtos...</div>
+            </div>
+        </section>
+
+        <section id="carrinho-section" style="display: none;">
+            <h2><i class="fas fa-shopping-cart"></i> Meu Carrinho</h2>
+            <div id="carrinho-container">
+                <div class="carrinho-vazio"><i class="fas fa-shopping-basket"></i> Seu carrinho está vazio</div>
+            </div>
+            <button id="finalizar-compra" class="btn-finalizar"><i class="fas fa-check-circle"></i> Finalizar Compra</button>
+            <button id="voltar-produtos" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar aos Produtos</button>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p><i class="far fa-copyright"></i> <span id="ano-atual"></span> Meu Ecommerce - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
